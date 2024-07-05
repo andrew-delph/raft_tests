@@ -1,19 +1,64 @@
 services:
-
   # This is a dummy service that will run forever. If you have a service that does run forever (like a database), you can skip this.
-  dummy:
-    image: alpine
-    command: tail -f /dev/null
+  # dummy:
+  #   image: alpine
+  #   command: tail -f /dev/null
 
-  golang:
+  node1:
     build:
       context: ./
       dockerfile: Dockerfile
-    command: go run main.go
+    hostname: node1
+    # command: go run main.go
     ports:
-      - '8080:8080'
-    develop:
-      watch:
-        - action: sync+restart
-          path: ./
-          target: /usr/src/app
+      - "8081:8080"
+    environment:
+      - NODE_ID=node1
+      - RAFT_PORT=8201
+      - HTTP_PORT=8080
+    # volumes:
+    #   - ./node1:/app/raft
+
+  node2:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    # command: go run main.go
+    hostname: node2
+    ports:
+      - "8082:8080"
+    environment:
+      - NODE_ID=node2
+      - RAFT_PORT=8202
+      - HTTP_PORT=8080
+      - JOIN=node1:8080
+    # volumes:
+    #   - ./node2:/app/raft
+
+  node3:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    # command: go run main.go
+    ports:
+      - "8083:8080"
+    environment:
+      - NODE_ID=node3
+      - RAFT_PORT=8203
+      - HTTP_PORT=8080
+      - JOIN=node1:8201
+    # volumes:
+    #   - ./node3:/app/raft
+
+  # golang:
+  #   build:
+  #     context: ./
+  #     dockerfile: Dockerfile
+  #   # command: go run main.go
+  #   ports:
+  #     - "8080:8080"
+  #   develop:
+  #     watch:
+  #       - action: sync+restart
+  #         path: ./
+  #         target: /usr/src/app
