@@ -1,0 +1,19 @@
+services:
+
+  # This is a dummy service that will run forever. If you have a service that does run forever (like a database), you can skip this.
+  dummy:
+    image: alpine
+    command: tail -f /dev/null
+
+  golang:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    command: go run main.go
+    ports:
+      - '8080:8080'
+    develop:
+      watch:
+        - action: sync+restart
+          path: ./
+          target: /usr/src/app
